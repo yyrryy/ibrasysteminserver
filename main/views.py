@@ -18,8 +18,8 @@ import telegram
 import asyncio
 import requests as req
 # # Your Telegram bot token
-bot_token='7266453006:AAG-MvJL1LYYH26tK-9TjRVpLMWTsPNhwB0'
-chat_id='-1002299894454'
+bot_token='555'
+chat_id='-000'
 # user_chat_ids = ['USER_CHAT_ID_1', 'USER_CHAT_ID_2', 'USER_CHAT_ID_3']
 # group_chat_id = '-4164185930'
 
