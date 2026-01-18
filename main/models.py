@@ -337,6 +337,7 @@ class Bonlivraison(models.Model):
     bon_no=models.CharField(max_length=50, null=True, default=None)
     # true when the bon is generated to be a facture
     isfacture=models.BooleanField(default=False)
+    iscontre=models.BooleanField(default=False)
     # true when the bon is DELIVERED
     isdelivered=models.BooleanField(default=False)
     # true when its paid
