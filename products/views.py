@@ -7,7 +7,7 @@ import openpyxl
 # import Count
 from django.contrib.auth.models import User
 from django.db.models import Count, F, Sum, Q, ExpressionWrapper, Func, fields, IntegerField
-from django.db.models.functions import Cast
+from django.db.models.functions import Cast, TruncDay, Substr
 from django.contrib.sessions.models import Session
 from functools import wraps
 from django.contrib.auth.decorators import user_passes_test
@@ -24,7 +24,6 @@ from django.contrib.auth import authenticate, login, logout
 import requests as req
 from collections import defaultdict
 import calendar
-from django.db.models.functions import TruncDay
 import uuid
 from .funcs import updatestockinremoteserver
 today = timezone.now().date()
@@ -295,6 +294,21 @@ def updatesupplier(request):
 
 def addoneproduct(request):
 
+    PREFIX = "pdct"
+    PREFIX_LEN = len(PREFIX)
+    t = (
+        Produit.objects
+        .annotate(
+            num=Cast(
+                Substr("uniqcode", PREFIX_LEN + 1),  # from position after 'pdct'
+                IntegerField()
+            )
+        )
+        .order_by("-num")
+        .first()
+    )
+    num = int(t.uniqcode.replace(PREFIX, ""))
+    uniqcode = f"{PREFIX}{num + 1}"
     ref=request.POST.get('refinadd').lower().strip().replace('§', '-')
     name=request.POST.get('nameinadd').strip()
     category=request.POST.get('categoryinadd')
