@@ -7052,7 +7052,7 @@ def createnewclientaccount(request):
         })
     user=User.objects.create_user(username=username, password=password)
     try:
-        response=req.get(f'http://{serverip}/products/createnewclientaccount', {
+        response=req.get(f'http://{serverip}/products/createnewclientaccount2', {
             'username':username,
             'password':password,
             'clientcode':client.code
