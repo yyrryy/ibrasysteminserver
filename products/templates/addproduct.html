@@ -183,7 +183,7 @@
             alertify.error('Veuillez remplir les champs obligatoires');
             return
         }
-        $(e.target).addClass('disabled')
+        $(e.target).addClass('disabled btn-loading')
         var formData = new FormData($('.addoneproductform')[0]);
         console.log($('[name="commercialsprixinadd"]').val())
         $.ajax({

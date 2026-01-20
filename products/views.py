@@ -355,7 +355,6 @@ def addoneproduct(request):
                 'uniqcode':uniqcode
             })
             res.raise_for_status()
-
         except req.exceptions.RequestException as e:
             print('>>> error', e)
             return JsonResponse({
@@ -385,7 +384,8 @@ def addoneproduct(request):
             carlogos_id=logo,
             stocktotal=0,
             stockfacture=0,
-            isactive=False
+            isactive=False,
+            uniqcode=uniqcode
         )
         # if image:
         #     image=product.image.url.replace('/media/', '')
