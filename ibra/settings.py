@@ -16,7 +16,6 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -28,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS=['http://ibraparts.ddns.net', 'http://ibraparts.ma']
+CSRF_TRUSTED_ORIGINS=['https://www.brahimpparts.com']
 CORS_ALLOWED_ORIGINS = [
     "*"
 ]
