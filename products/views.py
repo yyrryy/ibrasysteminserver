@@ -689,6 +689,7 @@ def addsupply(request):
         tva=tva,
         dateentree=datefacture
     )
+    uniqcodes=[]
     for i in json.loads(products):
         devise=0 if i['devise']=='' else i['devise']
         product=Produit.objects.get(pk=i['productid'])
@@ -726,6 +727,9 @@ def addsupply(request):
         product.qtycommande=0
         product.supplier=supplier
         product.save()
+        uniqcodes.append([product.uniqcode, product.stocktotal])
+    if serverip:
+        Thread(target=updatestockinremoteserver, args=(uniqcodes, serverip)).start()
     return JsonResponse({
         'html': render(request, 'recevoir.html', {'title':'Recevoir Les produits', 'suppliers':Supplier.objects.all(), 'products':Produit.objects.all()}).content.decode('utf-8')
     })
