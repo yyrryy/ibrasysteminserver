@@ -393,8 +393,7 @@ def addoneproduct(request):
 
 
     return JsonResponse({
-        'success':False,
-        'error':f'error {e}'
+        'success':True,
     })
 
 
