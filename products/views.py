@@ -91,7 +91,7 @@ def createcategory(request):
     image=request.FILES.get('categoryimage')
     files={'image':image}
     # create category
-    if serverip
+    if serverip:
         try:
             res=req.post(f'http://{serverip}/products/createcategory2', {
                 'name':name,
