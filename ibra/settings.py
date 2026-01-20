@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS=['http://ibraparts.ddns.net', 'https://ibraparts.ma']
+CSRF_TRUSTED_ORIGINS=['http://ibraparts.ddns.net', 'http://ibraparts.ma']
 CORS_ALLOWED_ORIGINS = [
     "*"
 ]
