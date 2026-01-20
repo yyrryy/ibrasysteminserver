@@ -1923,7 +1923,7 @@ def updatebonlivraison(request):
         product.save()
         i.delete()
 
-    print('client:', livraison.client.id)
+    uniqcodes=[]
     for i in json.loads(request.POST.get('products')):
         # ABORTER FOR NOW
         # clientpricehistory=Clientprices.objects.filter(client_id=livraison.client.id, product_id=i['productid']) or None
@@ -1951,9 +1951,12 @@ def updatebonlivraison(request):
             qty=qty,
             price=i['price'],
             total=i['total'],
-            date=datebon
+            date=datebon,
+            client=client
         )
-
+        uniqcodes.append([product.uniqcode, product.stocktotal])
+    if serverip:
+        Thread(target=updatestockinremoteserver, args=(uniqcodes, serverip)).start()
     return JsonResponse({
         'success':True
     })
