@@ -29,7 +29,7 @@ import uuid
 from .funcs import updatestockinremoteserver
 today = timezone.now().date()
 thisyear=timezone.now().year
-serverip = 'ibraparts.ma'
+serverip = '157.245.74.156:8000'
 
 def isadmin(user):
     if not user.groups.filter(name='admin').exists():
@@ -141,7 +141,7 @@ def updatecategory(request):
         'categories':Category.objects.all().order_by('code'),
         'title':'Categories'
     }
-    req.get('http://ibraparts.ma/products/updatecategory', {
+    req.get(f'http://{serverip}/products/updatecategory', {
         'id':id,
         'image':category.image.url.replace('/media/', '') if category.image else '',
         'hideclient':hideclient,
@@ -205,7 +205,7 @@ def updatemarque(request):
     if image:
         mark.image=image
     mark.save()
-    req.get('http://ibraparts.ma/products/updatemarque', {
+    req.get(f'http://{serverip}/products/updatemarque', {
         'id':id,
         'name':request.POST.get('name'),
         'hideclient':hideclient,
@@ -294,61 +294,60 @@ def updatesupplier(request):
     })
 
 def addoneproduct(request):
-    try:
 
-        ref=request.POST.get('refinadd').lower().strip().replace('§', '-')
-        name=request.POST.get('nameinadd').strip()
-        category=request.POST.get('categoryinadd')
-        commercialsprix=request.POST.get('commercialsprix') or "[]"
-        mark=request.POST.get('marqueinadd') or None
-        logo=request.POST.get('logoinadd', None)
-        image=request.FILES.get('imageinadd', None)
-        sellprice=request.POST.get('sellpriceinadd') or 0
-        supplier=request.POST.get('supplier') or None
-        minstock=request.POST.get('minstock') or 0
-        buyprice=request.POST.get('buyprice') or 0
-        remise=request.POST.get('remiseinadd') or 0
-        diametre=request.POST.get('diametreinadd') or ''
-        representprice=request.POST.get('repprice') or None
-        code=request.POST.get('codeinadd') or ''
-        block=request.POST.get('blockinadd') or ''
-        equivalent=request.POST.get('equivinadd') or ''
-        cars=request.POST.getlist('carsinadd') or ''
-        netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
-        if serverip:
-            try:
-                res=req.get(f'http://{serverip}/products/addoneproduct2', {
-                    'ref':ref,
-                    'name':name,
-                    'buyprice':buyprice,
-                    'diametre':diametre,
-                    'sellprice':sellprice,
-                    'remise':remise,
-                    'prixnet':netprice,
-                    'representprice':representprice,
-                    'minstock':minstock,
-                    'equivalent':equivalent,
-                    'cars':cars,
-                    'category':category,
-                    'supplier':supplier,
-                    'mark':mark,
-                    'image':'',
-                    'code':code,
-                    'repsprice':commercialsprix,
-                    'block':block,
-                    'carlogos_id':logo,
-                    'stocktotal':0,
-                    'stockfacture':0,
-                    'uniqcode':uniqcode
-                })
-                res.raise_for_status()
+    ref=request.POST.get('refinadd').lower().strip().replace('§', '-')
+    name=request.POST.get('nameinadd').strip()
+    category=request.POST.get('categoryinadd')
+    commercialsprix=request.POST.get('commercialsprix') or "[]"
+    mark=request.POST.get('marqueinadd') or None
+    logo=request.POST.get('logoinadd', None)
+    image=request.FILES.get('imageinadd', None)
+    sellprice=request.POST.get('sellpriceinadd') or 0
+    supplier=request.POST.get('supplier') or None
+    minstock=request.POST.get('minstock') or 0
+    buyprice=request.POST.get('buyprice') or 0
+    remise=request.POST.get('remiseinadd') or 0
+    diametre=request.POST.get('diametreinadd') or ''
+    representprice=request.POST.get('repprice') or None
+    code=request.POST.get('codeinadd') or ''
+    block=request.POST.get('blockinadd') or ''
+    equivalent=request.POST.get('equivinadd') or ''
+    cars=request.POST.getlist('carsinadd') or ''
+    netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
+    if serverip:
+        try:
+            res=req.get(f'http://{serverip}/products/addoneproduct2', {
+                'ref':ref,
+                'name':name,
+                'buyprice':buyprice,
+                'diametre':diametre,
+                'sellprice':sellprice,
+                'remise':remise,
+                'prixnet':netprice,
+                'representprice':representprice,
+                'minstock':minstock,
+                'equivalent':equivalent,
+                'cars':cars,
+                'category':category,
+                'supplier':supplier,
+                'mark':mark,
+                'image':'',
+                'code':code,
+                'repsprice':commercialsprix,
+                'block':block,
+                'carlogos_id':logo,
+                'stocktotal':0,
+                'stockfacture':0,
+                'uniqcode':uniqcode
+            })
+            res.raise_for_status()
 
-            except req.exceptions.RequestException as e:
-                print('>>> error', e)
-                return JsonResponse({
-                    'success':False,
-                    'error':f'error {e}'
-                })
+        except req.exceptions.RequestException as e:
+            print('>>> error', e)
+            return JsonResponse({
+                'success':False,
+                'error':f'error {e}'
+            })
         # create product
         product=Produit.objects.create(
             ref=ref,
@@ -379,15 +378,10 @@ def addoneproduct(request):
         # the product is created in the server without the image, you can send another request to assign the image if it's selected by the user
 
 
-        return JsonResponse({
-            'success':True,
-
-        })
-    except Exception as e:
-        print(e)
-        return JsonResponse({
-            'error':e
-        })
+    return JsonResponse({
+        'success':False,
+        'error':f'error {e}'
+    })
 
 
 def viewoneproduct(request, id):
@@ -981,7 +975,7 @@ def addcommercial(request):
     repregion=request.POST.get('repregion')
     repinfo=request.POST.get('repinfo')
     try:
-        request=req.get('http://ibraparts.ma/products/addcommercial2',{
+        request=req.get(f'http://{serverip}/products/addcommercial2',{
             'repusername':repusername,
             'reppassword':reppassword,
             'repname':repname,
@@ -1140,7 +1134,7 @@ def updateclient(request):
          })
     oldcode=client.code
     try:
-        res=req.get('http://ibraparts.ma/products/updateclient', {
+        res=req.get(f'http://{serverip}/products/updateclient', {
             'clientcode':oldcode,
             'name':request.POST.get('updateclientname'),
             'phone':request.POST.get('updateclientphone'),
@@ -1573,7 +1567,7 @@ def activerproduct(request):
         'entries':Stockin.objects.filter(product=product),
         'sorties':Orderitem.objects.filter(product=product),
     }
-    req.get('http://ibraparts.ma/products/activerproduct', {
+    req.get(f'http://{serverip}/products/activerproduct', {
         'id':request.POST.get('id')
     })
     return JsonResponse({
@@ -1595,7 +1589,7 @@ def desactiverproduct(request):
         'entries':Stockin.objects.filter(product=product),
         'sorties':Orderitem.objects.filter(product=product),
     }
-    req.get('http://ibraparts.ma/products/desactiverproduct', {
+    req.get(f'http://{serverip}/products/desactiverproduct', {
         'id':request.POST.get('id')
     })
     return JsonResponse({
@@ -4500,7 +4494,7 @@ def deactivateaccount(request):
     user=User.objects.get(id=userid)
     user.is_active=False
     user.save()
-    req.get('http://ibraparts.ma/products/deactivateaccount', {
+    req.get(f'http://{serverip}/products/deactivateaccount', {
         'username':user.username,
     })
     # delete user session in django session
@@ -4517,7 +4511,7 @@ def activateaccount(request):
     user=User.objects.get(id=userid)
     user.is_active=True
     user.save()
-    req.get('http://ibraparts.ma/products/activateaccount', {
+    req.get(f'http://{serverip}/products/activateaccount', {
         'username':user.username,
     })
     return JsonResponse({
@@ -5160,7 +5154,7 @@ def boncommandes(request):
 
 def listeconnected(request):
     five_minutes_ago = timezone.now() - timedelta(minutes=10)
-    res=req.get('http://ibraparts.ma/products/listeconnected')
+    res=req.get(f'http://{serverip}/products/listeconnected')
     print(json.loads(res.text)['connected'])
     print('>>', res.text)
     notconnected=Connectedusers.objects.filter(lasttime__lt=five_minutes_ago).order_by('-lasttime')
@@ -5189,7 +5183,7 @@ def createpromotion(request):
     image=request.FILES.get('promotionimage')
     # create category
     pr=Promotion.objects.create(info=name, image=image)
-    req.get('http://ibraparts.ma/products/createpromotion', {
+    req.get(f'http://{serverip}/products/createpromotion', {
         'name':name,
         # get image file
         'image':pr.image.url.replace('/media/', '') if pr.image else ''
@@ -5210,7 +5204,7 @@ def updatepromotion(request):
     if image:
         promotion.image=image
     promotion.save()
-    req.get('http://ibraparts.ma/products/updatepromotion', {
+    req.get(f'http://{serverip}/products/updatepromotion', {
         'name':request.POST.get('name'),
         'id':id,
         # get image file
@@ -7037,7 +7031,7 @@ def createnewclientaccount(request):
         })
     user=User.objects.create_user(username=username, password=password)
     try:
-        response=req.get('http://ibraparts.ma/products/createnewclientaccount', {
+        response=req.get(f'http://{serverip}/products/createnewclientaccount', {
             'username':username,
             'password':password,
             'clientcode':client.code
@@ -7084,7 +7078,7 @@ def createnewrepaccount(request):
             'error':'Username exist déja'
         })
     try:
-        response=req.get('http://ibraparts.ma/products/createnewrepaccount', {
+        response=req.get(f'http://{serverip}/products/createnewrepaccount', {
             'username':username,
             'password':password,
             'repid':repid
@@ -8447,7 +8441,7 @@ def updaterepdata(request):
     'caneditprice':caneditprice
     }
     try:
-        res=req.get('http://ibraparts.ma/products/updaterepdata', data)
+        res=req.get(f'http://{serverip}/products/updaterepdata', data)
         res.raise_for_status()
     except:
         # in case connection failed
@@ -8526,7 +8520,7 @@ def getitemsforlistbl(request):
         'categories':categories
     })
 def refspage(request):
-    res=req.get('http://ibraparts.ma/products/refspage')
+    res=req.get(f'http://{serverip}/products/refspage')
     print(res)
 
     refs=Refstats.objects.all().order_by('-lastdate')
@@ -8803,7 +8797,7 @@ def listnotifications(request):
 def addnotification(request):
     notification=request.GET.get('notification')
     try:
-        req.get('http://ibraparts.ma/products/addnotification', {'notificationid':notificationid,'notification':notification})
+        req.get(f'http://{serverip}/products/addnotification', {'notificationid':notificationid,'notification':notification})
 
         Notification.objects.create(notification=notification)
         return JsonResponse({
@@ -8823,7 +8817,7 @@ def updatenotification(request):
         'success':True
     })
     # try:
-    #     req.get('http://ibraparts.ma/products/updatenotification', {'notificationid':notificationid,'notification':notification})
+    #     req.get(f'http://{serverip}/products/updatenotification', {'notificationid':notificationid,'notification':notification})
     #     notif=Notification.objects.get(pk=notificationid)
     #     notif.notification=notification
     #     notif.save()
@@ -8933,7 +8927,7 @@ def updateproductstock(request):
     product=Produit.objects.get(pk=productid)
     diff=int(stock)-int(product.stocktotal)
     Modifierstock.objects.create(stock=diff, product=product)
-    req.get('http://ibraparts.ma/products/updatepdctdata', {
+    req.get(f'http://{serverip}/products/updatepdctdata', {
 
         'id':productid,
         'ref':product.ref,
@@ -9002,7 +8996,7 @@ def getclientcode(request):
 def allowcatalog(request):
     clientcode=request.GET.get('clientcode')
     try:
-        res=req.get('http://ibraparts.ma/products/allowcatalog', {
+        res=req.get(f'http://{serverip}/products/allowcatalog', {
             'clientcode':clientcode,
         })
         print(res)

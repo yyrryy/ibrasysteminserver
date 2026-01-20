@@ -1,6 +1,6 @@
 import requests as req
 
-serverip = 'ibraparts.ma'
+serverip = '157.245.74.156:8000'
 def updatestockinremoteserver(products, serverip):
     url = f"http://{serverip}/products/updatestockfromthread"
     headers = {'Content-Type': 'application/json'}

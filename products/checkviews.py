@@ -29,7 +29,7 @@ import uuid
 from dateutil.relativedelta import relativedelta
 today = timezone.now().date()
 thisyear=timezone.now().year
-
+serverip = '157.245.74.156:8000'
 def checklivraisonno(request):
     no=request.GET.get('no')
     id=request.GET.get('id')
@@ -864,15 +864,15 @@ def updatestockinv(request):
     })
     # all them entries are not aligning themselves with the traditional services that we had established there as long as the products is cinserned , jduidhjzejfuehjsdfjejsdodsdjkf jusdfu
 def getconnected(request):
-    res=req.get('http://ibraparts.ma/products/getconnectedusers')
+    res=req.get(f'http://{serverip}/products/getconnectedusers')
     return JsonResponse(json.loads(res.text))
 def getusercart(request):
     userid=request.GET.get('userid')
-    res=req.get('http://ibraparts.ma/getitemsincart?userid='+userid)
+    res=req.get(f'http://{serverip}/getitemsincart?userid='+userid)
     return JsonResponse(json.loads(res.text))
 def getitemsinwishlist(request):
     userid=request.GET.get('userid')
-    res=req.get('http://ibraparts.ma/getitemsinwishlist?userid='+userid)
+    res=req.get(f'http://{serverip}/getitemsinwishlist?userid='+userid)
     return JsonResponse(json.loads(res.text))
 def initpage(request):
     return render(request, 'initpage.html')
