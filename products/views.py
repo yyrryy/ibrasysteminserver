@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, redirect
 from main.models import Produit, Mark, Category, Supplier, Stockin, Itemsbysupplier, Client, Represent, Order, Orderitem, Clientprices, Bonlivraison, Facture, Outfacture, Livraisonitem, PaymentClientbl, PaymentClientfc,  PaymentSupplier, Bonsregle, Returnedsupplier, Avoirclient, Returned, Avoirsupplier, Orderitem, Carlogos, Ordersnotif, Connectedusers, Promotion, UserSession, Refstats, Notavailable, Cart, Wich, wishlist, Notification, Modifierstock, Cartitems, Notesrepresentant, Achathistory, Excelecheances, Tva, Etude, EtudeItem
 from django.contrib.auth import logout
@@ -25,9 +26,10 @@ from collections import defaultdict
 import calendar
 from django.db.models.functions import TruncDay
 import uuid
+from .funcs import updatestockinremoteserver
 today = timezone.now().date()
 thisyear=timezone.now().year
-
+serverip = 'ibraparts.ma'
 
 def isadmin(user):
     if not user.groups.filter(name='admin').exists():
@@ -87,7 +89,24 @@ def createcategory(request):
 
     # get image file
     image=request.FILES.get('categoryimage')
+    files={'image':image}
     # create category
+    if serverip
+        try:
+            res=req.post(f'http://{serverip}/products/createcategory2', {
+                'name':name,
+                'code':code,
+                'affichage':affichage,
+                'hideclient':hideclient,
+                'commercialexcluded':commercialexcluded,
+                # get image file
+            }, files=files)
+            res.raise_for_status()
+        except req.exceptions.RequestException as e:
+            return JsonResponse({
+                'success':False,
+                'error':'Error in request to the server'
+            })
     category=Category.objects.create(name=name, image=image, code=code, affichage=affichage, masqueclients=hideclient)
     if len(commercialexcluded) > 0:
         category.excludedrep.set(reps)
@@ -95,26 +114,6 @@ def createcategory(request):
         'categories':Category.objects.all().order_by('code'),
         'title':'Categories'
     }
-    print({
-
-        'name':name,
-        'code':code,
-        'affichage':affichage,
-        'hideclient':hideclient,
-        'commercialexcluded':commercialexcluded,
-        # get image file
-        'image':category.image.url.replace('/media/', '') if category.image else ''
-    })
-    req.get('http://ibraparts.ma/products/createcategory', {
-
-        'name':name,
-        'code':code,
-        'affichage':affichage,
-        'hideclient':hideclient,
-        'commercialexcluded':commercialexcluded,
-        # get image file
-        'image':category.image.url.replace('/media/', '') if category.image else ''
-    })
     return JsonResponse({
         'html':render(request, 'categories.html', ctx).content.decode('utf-8')
     })
@@ -172,17 +171,22 @@ def createmarque(request):
     hideclient=request.POST.get('hideclientmrk')=='True'
     commercialexcluded=request.POST.getlist('commercialexcludedmrk')
     reps=Represent.objects.filter(pk__in=commercialexcluded)
-
+    if serverip:
+        try:
+            req.get(f'http://{serverip}/products/createmarque2', {
+                'name':name,
+                'hideclient':hideclient,
+                'commercialexcluded':commercialexcluded,
+                # get image file
+                'image':mrq.image.url.replace('/media/', '') if mrq.image else ''
+            })
+        except:
+            return JsonResponse({
+                'success':False
+            })
     mrq=Mark.objects.create(name=name, image=image, masqueclients=hideclient)
     if len(commercialexcluded) > 0:
         mrq.excludedrep.set(reps)
-    req.get('http://ibraparts.ma/products/createmarque', {
-        'name':name,
-        'hideclient':hideclient,
-        'commercialexcluded':commercialexcluded,
-        # get image file
-        'image':mrq.image.url.replace('/media/', '') if mrq.image else ''
-    })
     return JsonResponse({
         'success':True
     })
@@ -311,30 +315,40 @@ def addoneproduct(request):
         equivalent=request.POST.get('equivinadd') or ''
         cars=request.POST.getlist('carsinadd') or ''
         netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
-        res=req.get('http://ibraparts.ma/products/addoneproduct', {
-            'ref':ref,
-            'name':name,
-            'buyprice':buyprice,
-            'diametre':diametre,
-            'sellprice':sellprice,
-            'remise':remise,
-            'prixnet':netprice,
-            'representprice':representprice,
-            'minstock':minstock,
-            'equivalent':equivalent,
-            'cars':cars,
-            'category':category,
-            'supplier':supplier,
-            'mark':mark,
-            'image':'',
-            'code':code,
-            'repsprice':commercialsprix,
-            'block':block,
-            'carlogos_id':logo,
-            'stocktotal':0,
-            'stockfacture':0
-        })
-        res.raise_for_status()
+        if serverip:
+            try:
+                res=req.get(f'http://{serverip}/products/addoneproduct2', {
+                    'ref':ref,
+                    'name':name,
+                    'buyprice':buyprice,
+                    'diametre':diametre,
+                    'sellprice':sellprice,
+                    'remise':remise,
+                    'prixnet':netprice,
+                    'representprice':representprice,
+                    'minstock':minstock,
+                    'equivalent':equivalent,
+                    'cars':cars,
+                    'category':category,
+                    'supplier':supplier,
+                    'mark':mark,
+                    'image':'',
+                    'code':code,
+                    'repsprice':commercialsprix,
+                    'block':block,
+                    'carlogos_id':logo,
+                    'stocktotal':0,
+                    'stockfacture':0,
+                    'uniqcode':uniqcode
+                })
+                res.raise_for_status()
+
+            except req.exceptions.RequestException as e:
+                print('>>> error', e)
+                return JsonResponse({
+                    'success':False,
+                    'error':f'error {e}'
+                })
         # create product
         product=Produit.objects.create(
             ref=ref,
@@ -447,6 +461,7 @@ def updateproduct(request):
             'error':'Ref exist deja'
             })
     image=request.FILES.get('image') or None
+    equivalent=' '.join(i.upper() for i in request.POST.get('equivalent').split())
     new=request.POST.get('switch')
     near=True if  request.POST.get('nearswitch') == 'on' else False
     logo=request.POST.get('updatepdctlogo', None)
@@ -455,22 +470,52 @@ def updateproduct(request):
     sellprice=request.POST.get('sellprice')
     netprice=round(float(sellprice)-(float(sellprice)*float(remise)/100), 2)
     product=Produit.objects.get(pk=productid)
+    files = {}
+    if image:
+        files['image'] = image    
+    if serverip:
+        print('>> serverip', serverip)
+        data={
+            'new':True if request.POST.get('switch')=='on' else False,
+            'logo':logo,
+            'productid':request.POST.get('productid'),
+            'remise':request.POST.get('remise'),
+            'sellprice':request.POST.get('sellprice'),
+            'netprice':round(float(sellprice)-(float(sellprice)*float(remise)/100), 2),
+            'equivalent':equivalent,
+            'near':near,
+            #'minstock':minstock,
+            'code':request.POST.get('updatecode'),
+            'refeq1':request.POST.get('refeq1'),
+            'refeq2':request.POST.get('refeq2'),
+            'refeq3':request.POST.get('refeq3'),
+            'refeq4':request.POST.get('refeq4'),
+            'repprice':request.POST.get('updaterepprice') or 0,
+            # 'coderef':request.POST.get('updatecoderef'),
+            'name':request.POST.get('name'),
+            'cars':json.dumps(request.POST.getlist('cars')),
+            'ref':request.POST.get('ref').lower().strip(),
+            'category_id':request.POST.get('category'),
+            'mark_id':request.POST.get('marque'),
+            'diametre':request.POST.get('diametre'),
+            'stock':product.stocktotal,
+            'uniqcode':product.uniqcode
+        }
+        print('>> data', data)
+        # if image:
+        #     data['image']=product.image.url.replace('/media/', '') if product.image else '/media/default.png',
+        
+        try:
+            res=req.post(f'http://{serverip}/products/updateproduct2', data=data, files=files)
+            res.raise_for_status()
+        except req.exceptions.RequestException as e:
+            return JsonResponse({
+                'success':False,
+                'error':f'error {e}'
+            })
     #if price changed itshould be changed in reliquat and panier of clients
-    if float(sellprice) != float(product.sellprice):
-        print('price changed')
-        reliquas=wishlist.objects.filter(product=product)
-        for i in reliquas:
-            i.total=round(float(netprice)*float(i.qty), 2)
-            i.save()
-        cartitems=Cartitems.objects.filter(product=product)
-        for i in cartitems:
-            newtotal=round(float(netprice)*float(i.qty), 2)
-            newcarttotal=i.cart.total-i.total+newtotal
-            i.total=newtotal
-            i.save()
-            i.cart.total=newtotal
-            i.cart.save()
-    equivalent=' '.join(i.upper() for i in request.POST.get('equivalent').split())
+    
+    
     product.carlogos_id=logo
     if new=='on':
       product.isnew=True
@@ -501,43 +546,6 @@ def updateproduct(request):
     if image:
         product.image=image
     product.save()
-    data={
-        #'image':product.image.url.replace('/media/', '') if product.image else '/media/default.png',
-        'new':True if request.POST.get('switch')=='on' else False,
-        'logo':request.POST.get('updatepdctlogo'),
-        'productid':request.POST.get('productid'),
-        'remise':request.POST.get('remise'),
-        'sellprice':request.POST.get('sellprice'),
-        'netprice':round(float(sellprice)-(float(sellprice)*float(remise)/100), 2),
-        'equivalent':equivalent,
-        'near':near,
-        'code':request.POST.get('updatecode'),
-        'refeq1':request.POST.get('refeq1'),
-        'refeq2':request.POST.get('refeq2'),
-        'refeq3':request.POST.get('refeq3'),
-        'refeq4':request.POST.get('refeq4'),
-        'repprice':request.POST.get('updaterepprice') or 0,
-        # 'coderef':request.POST.get('updatecoderef'),
-        'name':request.POST.get('name'),
-        'cars':json.dumps(request.POST.getlist('cars')),
-        'ref':request.POST.get('ref').lower().strip(),
-        'category_id':request.POST.get('category'),
-        'mark_id':request.POST.get('marque'),
-        'diametre':request.POST.get('diametre'),
-        'stock':product.stocktotal,
-        'uniqcode':product.uniqcode
-    }
-    if image:
-        print('sending new image')
-        data['image']=product.image.url.replace('/media/', '') if product.image else '/media/default.png',
-    print('>>end ',product)
-    print('>>>>>>>>>>>>>> equivalent>',equivalent)
-
-    res=req.get('http://ibraparts.ma/products/updateproduct', data)
-    print('>>>>>>', res)
-    if not res.status_code == 200:
-            print('Error message:', res.text)
-    print('>>>>>>', request.POST.getlist('cars'))
     return JsonResponse({
         'success':True
     })
@@ -771,6 +779,7 @@ def addbonlivraison(request):
         note=note
     )
     print('>>>>>>', len(json.loads(products))>0)
+    uniqcides=[]
     if len(json.loads(products))>0:
         with transaction.atomic():
             for i in json.loads(products):
@@ -789,8 +798,11 @@ def addbonlivraison(request):
                     client_id=clientid,
                     date=datebon
                 )
+                uniqcides.append([product.uniqcode, product.stocktotal])
 
-
+    if serverip:
+        Thread(target=updatestockinremoteserver, args=(uniqcides, serverip)).start()
+    
     # increment it
     return JsonResponse({
         "success":True
@@ -969,7 +981,7 @@ def addcommercial(request):
     repregion=request.POST.get('repregion')
     repinfo=request.POST.get('repinfo')
     try:
-        request=req.get('http://ibraparts.ma/products/addcommercial',{
+        request=req.get('http://ibraparts.ma/products/addcommercial2',{
             'repusername':repusername,
             'reppassword':reppassword,
             'repname':repname,
@@ -1057,43 +1069,42 @@ def addclient(request):
             'success':False,
             'error':'Code ou Nom exist deja'
         })
-    try:
-        response=req.get('http://ibraparts.ma/products/addclient', {
-            'city':city,
-            'ice':ice,
-            'region':region,
-            'represent_id':representant,
-            'code':code,
-            'name':name,
-            'phone':phone,
-            'address':address,
-        })
-        response.raise_for_status()
-        client=Client.objects.create(
-            city=city,
-            ice=ice,
-            region=region,
-            represent_id=representant,
-            code=code,
-            name=name,
-            phone=phone,
-            phone2=phone2,
-            address=address,
-            soldtotal=0.00,
-            soldfacture=0.00,
-            soldbl=0.00,
-            diver=False
-        )
-
-
-        return JsonResponse({
-            'success':True
-        })
-    except Exception as e:
-        return JsonResponse({
-            'success':False,
-            'error':e
-        })
+    if serverip:
+        try:
+            response=req.get(f'http://{serverip}/products/addclient2', {
+                'city':city,
+                'ice':ice,
+                'region':region,
+                'represent_id':representant,
+                'code':code,
+                'name':name,
+                'phone':phone,
+                'address':address,
+            })
+            response.raise_for_status()
+        except Exception as e:
+            return JsonResponse({
+                'success':False,
+                'error':f'Error connexion au serveur distant: {e}'
+            })
+    client=Client.objects.create(
+        city=city,
+        ice=ice,
+        region=region,
+        represent_id=representant,
+        code=code,
+        name=name,
+        phone=phone,
+        phone2=phone2,
+        address=address,
+        soldtotal=0.00,
+        soldfacture=0.00,
+        soldbl=0.00,
+        diver=False
+    )
+    return JsonResponse({
+        'success':True
+    })
 
 def getclientdata(request):
     id=request.POST.get('id')
@@ -4117,28 +4128,26 @@ def createclientaccount(request):
     username=request.POST.get('username')
     password=request.POST.get('password')
     #check for username
-    user=User.objects.filter(username=username).first()
-    if user:
-        return JsonResponse({
-            'success':False,
-            'error':'Username exist déja'
+    if serverip:
+        res=req.get(f'http://{serverip}/products/createclientaccount2', {
+            'clientcode':client.code,
+            'username':username,
+            'password':password
         })
-
-    # create user
-    user=User.objects.create_user(username=username, password=password)
-    # assign user to client
-    group, created = Group.objects.get_or_create(name="clients")
-    user.groups.add(group)
-    user.save()
-    client.user=user
-    client.save()
-    req.get('http://ibraparts.ma/products/createclientaccount', {
-        'clientcode':client.code,
-        'username':username,
-        'password':password
-    })
+        if json.loads(res.text)['success']:
+            return JsonResponse({
+                'success':True
+            })
+        else:
+            return JsonResponse({
+                'success':False,
+                'error':f"{json.loads(res.text)['error']}"
+            })
+    # user=User.objects.filter(username=username).first()
+    # if user:
     return JsonResponse({
-        'success':True
+        'success':False,
+        'error':'No server'
     })
 
 
@@ -4148,21 +4157,21 @@ def createrepaccount(request):
     username=request.POST.get('username')
     password=request.POST.get('password')
     #check for username
-    user=User.objects.filter(username=username).first()
-    if user:
-        return JsonResponse({
-            'success':False,
-            'error':'Username exist déja'
+    if serverip:
+        res=req.get(f'http://{serverip}/products/createrepaccount2', {
+            'repid':repid,
+            'username':username,
+            'password':password
         })
-
-    # create user
-    user=User.objects.create_user(username=username, password=password)
-    # assign user to rep
-    group, created = Group.objects.get_or_create(name="salsemen")
-    user.groups.add(group)
-    user.save()
-    rep.user=user
-    rep.save()
+        if json.loads(res.text)['success']:
+            return JsonResponse({
+                'success':True
+            })
+        else:
+            return JsonResponse({
+                'success':False,
+                'error':f"{json.loads(res.text)['error']}"
+            })
     return JsonResponse({
         'success':True
     })
