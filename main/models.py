@@ -323,7 +323,7 @@ class Order(models.Model):
         self.code = str(uuid.uuid4())
         super().save(*args, **kwargs)  #
     def __str__(self) -> str:
-        return self.client.name+' '+str(self.total)
+        return self.client.name+' '+str(self.total)+' '+str(self.isdelivered)
 
 class Bonlivraison(models.Model):
     commande=models.ForeignKey(Order, on_delete=models.SET_NULL, default=None, null=True, blank=True)
