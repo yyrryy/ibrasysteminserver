@@ -814,8 +814,11 @@ a .uil {
     <!-- site -->
     <a id="button"></a>
     <div class="site">
+      <div style="position: absolute; bottom: 0; z-index: 999;">
 
-      <button class="bi bi-list text-white btn bg-darkblue" style="position: absolute; bottom: 0; z-index: 999;" onclick="extendtabs()"></button>
+        <button class="bi bi-list text-white btn bg-darkblue"  onclick="extendtabs()"></button>
+        <button class="bi bi-bell text-white btn bg-darkblue boncommandesnumberholder" onclick="createtab('addCommandestab', 'BON COMMANDES', 'products/listboncommnd')"><span class="boncommandesnumber">0</span></button>
+      </div>
         <!-- site__body -->
 
         <!-- screen loader -->
@@ -2094,26 +2097,30 @@ a .uil {
 
 
       function getNotifications() {
+        console.log('checking for notifications...')
         $.ajax({
             url: '/products/notifyadmin',  // Replace with the actual URL of your API endpoint
             method: 'GET',
             success: function (data) {
                 // Handle the retrieved notifications and display them
+                $('.boncommandesnumber').text(data.length)
                 if (data.length > 0){
                   // var audio = document.getElementById('notificationSound');
-                  new Audio('/media/notif.mp3').play();
-                  alertify.confirm('Commande', 'Nouveau Commande', function(){
-                    // stop playing audio
-                    // audio.pause();
-                    // audio.currentTime = 0;
-                    // user clicked "ok"
-                    $.get('/products/disablenotif', (data)=>{
-                      console.log(data)
-                    })
-                    setTimeout(getNotifications, 20000);  // Poll every 5 seconds (adjust as needed)
-                    createtab('addCommandestab', 'BON COMM', 'products/listboncommnd')
+                  // if there is commands, just make holder blink and display the nbr of commandes
+                  $('.boncommandesnumberholder').addClass('blink')
+                  // new Audio('/media/notif.mp3').play();
+                  // alertify.confirm('Commande', 'Nouveau Commande', function(){
+                  //   // stop playing audio
+                  //   // audio.pause();
+                  //   // audio.currentTime = 0;
+                  //   // user clicked "ok"
+                  //   $.get('/products/disablenotif', (data)=>{
+                  //     console.log(data)
+                  //   })
+                  setTimeout(getNotifications, 20000);  // Poll every 5 seconds (adjust as needed)
+                  //   createtab('addCommandestab', 'BON COMM', '/products/listboncommnd')
 
-                  }, function(){});
+                  // }, function(){});
 
                 }
                 else{
@@ -2126,8 +2133,7 @@ a .uil {
             }
         });
 
-    }
-    // function getoutsideNotifications() {
+    }// function getoutsideNotifications() {
     //     $.ajax({
     //         url: f'http://{serverip}/products/notifyadmin',  // Replace with the actual URL of your API endpoint
     //         method: 'GET',
