@@ -1574,8 +1574,6 @@ def activerproduct(request):
     id=request.POST.get('id')
     product=Produit.objects.get(pk=id)
     uniqcode=product.uniqcode
-    serverip= Setting.objects.only('serverip').first()
-    serverip=serverip.serverip if serverip else None
     if serverip:
         res=req.get(f'http://{serverip}/products/activerproduct', {
             'uniqcode':uniqcode
@@ -1623,8 +1621,6 @@ def desactiverproduct(request):
     id=request.POST.get('id')
     product=Produit.objects.get(pk=id)
     uniqcode=product.uniqcode
-    serverip= Setting.objects.only('serverip').first()
-    serverip=serverip.serverip if serverip else None
     if serverip:
         res=req.get(f'http://{serverip}/products/desactiverproduct', {
             'uniqcode':uniqcode
