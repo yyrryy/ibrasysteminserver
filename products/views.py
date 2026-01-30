@@ -1573,6 +1573,34 @@ def listfactures(request):
 def activerproduct(request):
     id=request.POST.get('id')
     product=Produit.objects.get(pk=id)
+    uniqcode=product.uniqcode
+    serverip= Setting.objects.only('serverip').first()
+    serverip=serverip.serverip if serverip else None
+    if serverip:
+        res=req.get(f'http://{serverip}/products/activerproduct', {
+            'uniqcode':uniqcode
+        })
+        if json.loads(res.text)['success']:
+            product.isactive=True
+            product.save()
+            return JsonResponse({
+                'success':True
+            })
+        else:
+            return JsonResponse({
+                'success':False,
+                'error':f"{json.loads(res.text)['error']}"
+            })
+    # user=User.objects.filter(username=username).first()
+    # if user:
+    product.isactive=True
+    product.save()
+    return JsonResponse({
+        'success':False,
+        'error':'No server'
+    })
+
+            
     product.isactive=True
     product.save()
     ctx={
@@ -1585,33 +1613,38 @@ def activerproduct(request):
         'entries':Stockin.objects.filter(product=product),
         'sorties':Orderitem.objects.filter(product=product),
     }
-    req.get(f'http://{serverip}/products/activerproduct', {
-        'id':request.POST.get('id')
-    })
+    
     return JsonResponse({
         'html':render(request, 'viewoneproduct.html', ctx).content.decode('utf-8')
     })
 
+
 def desactiverproduct(request):
     id=request.POST.get('id')
     product=Produit.objects.get(pk=id)
+    uniqcode=product.uniqcode
+    serverip= Setting.objects.only('serverip').first()
+    serverip=serverip.serverip if serverip else None
+    if serverip:
+        res=req.get(f'http://{serverip}/products/desactiverproduct', {
+            'uniqcode':uniqcode
+        })
+        if json.loads(res.text)['success']:
+            product.isactive=False
+            product.save()
+            return JsonResponse({
+                'success':True
+            })
+        else:
+            return JsonResponse({
+                'success':False,
+                'error':f"{json.loads(res.text)['error']}"
+            })
     product.isactive=False
     product.save()
-    ctx={
-        'title':'Detail de '+product.ref,
-        'product':product,
-        'cars':product.getcars(),
-        'categories':Category.objects.all(),
-        'marques':Mark.objects.all(),
-        'suppliers':Supplier.objects.all(),
-        'entries':Stockin.objects.filter(product=product),
-        'sorties':Orderitem.objects.filter(product=product),
-    }
-    req.get(f'http://{serverip}/products/desactiverproduct', {
-        'id':request.POST.get('id')
-    })
     return JsonResponse({
-        'html':render(request, 'viewoneproduct.html', ctx).content.decode('utf-8')
+        'success':False,
+        'error':'No server'
     })
 
 def generatefacture(request, id):
