@@ -2097,40 +2097,30 @@ a .uil {
 
 
       function getNotifications() {
-        console.log('checking for notifications...')
-        $.ajax({
-            url: '/products/notifyadmin',  // Replace with the actual URL of your API endpoint
-            method: 'GET',
-            success: function (data) {
-                // Handle the retrieved notifications and display them
-                $('.boncommandesnumber').text(data.length)
-                if (data.length > 0){
-                  // var audio = document.getElementById('notificationSound');
-                  // if there is commands, just make holder blink and display the nbr of commandes
-                  $('.boncommandesnumberholder').addClass('blink')
-                  // new Audio('/media/notif.mp3').play();
-                  // alertify.confirm('Commande', 'Nouveau Commande', function(){
-                  //   // stop playing audio
-                  //   // audio.pause();
-                  //   // audio.currentTime = 0;
-                  //   // user clicked "ok"
-                  //   $.get('/products/disablenotif', (data)=>{
-                  //     console.log(data)
-                  //   })
-                  setTimeout(getNotifications, 100000);  // Poll every 5 seconds (adjust as needed)
-                  //   createtab('addCommandestab', 'BON COMM', '/products/listboncommnd')
+  console.log('checking for notifications...');
 
-                  // }, function(){});
+  $.ajax({
+    url: '/products/notifyadmin',
+    method: 'GET',
+    success: function (data) {
+      $('.boncommandesnumber').text(data.length);
 
-                }
-                else{
-                  setTimeout(getNotifications, 100000);  // Poll every 20 seconds (adjust as needed)
-                }
-
-            }
-        });
-
-    }// function getoutsideNotifications() {
+      if (data.length > 0) {
+        $('.boncommandesnumberholder').addClass('blink');
+        // new Audio('/media/notif.mp3').play();
+      } else {
+        $('.boncommandesnumberholder').removeClass('blink');
+      }
+    },
+    error: function (err) {
+      console.error('Notification check failed', err);
+    },
+    complete: function () {
+      // ALWAYS schedule next poll
+      setTimeout(getNotifications, 10000); // 10 seconds
+    }
+  });
+}// function getoutsideNotifications() {
     //     $.ajax({
     //         url: f'http://{serverip}/products/notifyadmin',  // Replace with the actual URL of your API endpoint
     //         method: 'GET',
