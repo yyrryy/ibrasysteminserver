@@ -3032,7 +3032,7 @@ def listboncommnd(request):
 
             # 5. Bulk insert
             Orderitem.objects.bulk_create(order_items)
-            ordersnotif.isread=True
+        ordersnotif.isread=True
         #Ordersnotif.objects.all().delete()
     orders=Order.objects.filter(date__year=thisyear).order_by('-id')[:50]
     ctx={
