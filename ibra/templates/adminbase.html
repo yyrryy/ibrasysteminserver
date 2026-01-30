@@ -2117,21 +2117,16 @@ a .uil {
                   //   $.get('/products/disablenotif', (data)=>{
                   //     console.log(data)
                   //   })
-                  setTimeout(getNotifications, 10000);  // Poll every 5 seconds (adjust as needed)
+                  setTimeout(getNotifications, 100000);  // Poll every 5 seconds (adjust as needed)
                   //   createtab('addCommandestab', 'BON COMM', '/products/listboncommnd')
 
                   // }, function(){});
 
                 }
                 else{
-                  setTimeout(getNotifications, 10000);  // Poll every 20 seconds (adjust as needed)
+                  setTimeout(getNotifications, 100000);  // Poll every 20 seconds (adjust as needed)
                 }
 
-            },
-            complete: function () {
-                  setTimeout(getNotifications, 10000);  // Poll every 5 seconds (adjust as needed)
-
-                // Schedule the next AJAX request after a short delay
             }
         });
 
