@@ -10,7 +10,7 @@
                         {{rep.name}}
                     </td>
                 </tr>
-                <tr>
+                <!-- <tr>
 
                     <td>
                         Username
@@ -31,13 +31,13 @@
                         </button>
                         {% endif %}
                     </td>
-                </tr>
+                </tr> -->
                 <tr>
                     <td>
                         Compte
                     </td>
                     <td>
-                        {% if rep.user %}
+                        <!-- {% if rep.user %}
                         {% if rep.user.is_active %}
                         <button class="btn w-100 btn-danger" onclick="desactivercompte('{{rep.user.id}}', 'rep{{rep.id}}', '/products/onereppage/{{rep.id}}')">
                             Desactiver
@@ -46,12 +46,10 @@
                         <button class="btn w-100 btn-success" onclick="activercompte('{{rep.user.id}}', 'rep{{rep.id}}', '/products/onereppage/{{rep.id}}')">
                             Activer
                         </button>
-                        {% endif %}
-                        {% else %}
+                        {% endif %} -->
                         <button class="btn w-100 btn-info" onclick="$('.creteacc{{rep.id}}').toggleClass('d-none')">
                             Creer compte
                         </button>
-                        {% endif %}
                     </td>
                 </tr>
                 <tr>
