@@ -46,7 +46,9 @@
                         <button class="btn w-100 btn-success" onclick="activercompte('{{rep.user.id}}', 'rep{{rep.id}}', '/products/onereppage/{{rep.id}}')">
                             Activer
                         </button>
-                        {% endif %} -->
+                        {% endif %}
+                        {% else %} 
+                        {% endif %}-->
                         <button class="btn w-100 btn-info" onclick="$('.creteacc{{rep.id}}').toggleClass('d-none')">
                             Creer compte
                         </button>
