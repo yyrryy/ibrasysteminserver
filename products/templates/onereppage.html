@@ -595,6 +595,7 @@
     }
 
     function createrepaccount(event){
+        $(event.target).addClass('btn-loading')
         parentdiv=$(event.target).parent().parent().parent()
         var username = parentdiv.find('input[name="repusername"]').val();
         var password = parentdiv.find('input[name="reppassword"]').val();
@@ -615,7 +616,9 @@
             dataType: 'json',
             success: function (data) {
                 if(data.success){
-                    updatetab('rep{{rep.id}}', 'products/onereppage/{{rep.id}}')
+                    alertify.success('Serverur: OK')
+                    // updatetab('rep{{rep.id}}', 'products/onereppage/{{rep.id}}')
+                    $('.creteacc{{rep.id}}').addClass('d-none')
                 }else{
                     alertify.error(data.error);
                 }

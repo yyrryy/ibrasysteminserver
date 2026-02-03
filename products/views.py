@@ -4243,7 +4243,6 @@ def createclientaccount(request):
 
 def createrepaccount(request):
     repid=request.POST.get('repid')
-    rep= Represent.objects.get(pk=repid)
     username=request.POST.get('username')
     password=request.POST.get('password')
     #check for username
