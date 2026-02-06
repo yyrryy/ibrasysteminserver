@@ -1208,7 +1208,9 @@ def updatecommercial(request):
     phone2=request.POST.get('updaterepphone2')
     region=request.POST.get('updaterepregion')
     region=request.POST.get('updaterepregion')
+    print("ddddd")
     if serverip:
+        print("============ddddd")
         res=req.get(f'http://{serverip}/products/updatecommercial', {
             "id":id,
             "name":name,
