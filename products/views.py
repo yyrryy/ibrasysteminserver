@@ -29,7 +29,7 @@ from threading import Thread
 from .funcs import updatestockinremoteserver
 today = timezone.now().date()
 thisyear=timezone.now().year
-serverip = '157.245.74.156:8000'
+serverip = '157.245.74.156'
 
 def isadmin(user):
     if not user.groups.filter(name='admin').exists():
@@ -1207,16 +1207,12 @@ def updatecommercial(request):
     phone=request.POST.get('updaterepphone')
     phone2=request.POST.get('updaterepphone2')
     region=request.POST.get('updaterepregion')
-    region=request.POST.get('updaterepregion')
-    print("ddddd")
     if serverip:
-        print("============ddddd")
         res=req.get(f'http://{serverip}/products/updatecommercial', {
             "id":id,
             "name":name,
             "phone":phone,
             "phone2":phone2,
-            "region":region,
             "region":region
         })
     rep=Represent.objects.get(pk=id)
