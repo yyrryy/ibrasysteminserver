@@ -1208,6 +1208,15 @@ def updatecommercial(request):
     phone2=request.POST.get('updaterepphone2')
     region=request.POST.get('updaterepregion')
     region=request.POST.get('updaterepregion')
+    if serverip:
+        res=req.get(f'http://{serverip}/products/updatecommercial', {
+            "id":id,
+            "name":name,
+            "phone":phone,
+            "phone2":phone2,
+            "region":region,
+            "region":region
+        })
     rep=Represent.objects.get(pk=id)
     rep.name=name
     rep.phone=phone
