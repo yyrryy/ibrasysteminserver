@@ -29,7 +29,7 @@ from threading import Thread
 from .funcs import updatestockinremoteserver
 today = timezone.now().date()
 thisyear=timezone.now().year
-serverip = '157.245.74.156'
+serverip = '157.245.74.156:8000'
 
 def isadmin(user):
     if not user.groups.filter(name='admin').exists():
