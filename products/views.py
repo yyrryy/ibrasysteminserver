@@ -223,7 +223,7 @@ def updatemarque(request):
                 # get image file
             }, files=files)
         except Exception as e:
-            print(f'error in update mark {e}')    
+            print(f'error in update mark {e}') 
     ctx={
         'marques':Mark.objects.all(),
         'title':'List des marques'
