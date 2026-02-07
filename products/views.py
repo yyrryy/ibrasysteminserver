@@ -102,11 +102,8 @@ def createcategory(request):
                 # get image file
             }, files=files)
             res.raise_for_status()
-        except req.exceptions.RequestException as e:
-            return JsonResponse({
-                'success':False,
-                'error':'Error in request to the server'
-            })
+        except Exception as e:
+            print(f'err in create category {e}')
     category=Category.objects.create(name=name, image=image, code=code, affichage=affichage, masqueclients=hideclient)
     if len(commercialexcluded) > 0:
         category.excludedrep.set(reps)
@@ -123,7 +120,6 @@ def updatecategory(request):
     image=request.FILES.get('updatecategoryimage') or None
     id=request.POST.get('id')
     hideclient=request.POST.get('hideclient')=='True'
-    print('>>>>>>>in updtae',request.POST.get('hideclient'))
     commercialexcluded=request.POST.getlist('commercialexcluded')
     reps=Represent.objects.filter(pk__in=commercialexcluded)
     category=Category.objects.get(pk=id)
@@ -133,23 +129,31 @@ def updatecategory(request):
     category.name=request.POST.get('updatecategoryname')
     category.code=request.POST.get('updatecategorycode')
     category.affichage=request.POST.get('updatecategoryaffichage')
+    files = {}
+    if image:
+        files['image'] = image
+    if serverip:
+        try:
+            res = req.post(f'http://{serverip}/products/updatecategory', {
+                'id':id,
+                'hideclient':hideclient,
+                'commercialexcluded':commercialexcluded,
+                'name':request.POST.get('updatecategoryname'),
+                'code':request.POST.get('updatecategorycode'),
+                'affichage':request.POST.get('updatecategoryaffichage'),
+            }, files=files)
+        except Exception as e:
+            print(f'err in update category {e}')
     if image:
         category.image=image
 
-    category.save()
+    category.save()  
+    
     ctx={
         'categories':Category.objects.all().order_by('code'),
         'title':'Categories'
     }
-    req.get(f'http://{serverip}/products/updatecategory', {
-        'id':id,
-        'image':category.image.url.replace('/media/', '') if category.image else '',
-        'hideclient':hideclient,
-        'commercialexcluded':commercialexcluded,
-        'name':request.POST.get('updatecategoryname'),
-        'code':request.POST.get('updatecategorycode'),
-        'affichage':request.POST.get('updatecategoryaffichage'),
-    })
+    
     return JsonResponse({
         'html':render(request, 'categories.html', ctx).content.decode('utf-8')
     })
@@ -171,19 +175,20 @@ def createmarque(request):
     hideclient=request.POST.get('hideclientmrk')=='True'
     commercialexcluded=request.POST.getlist('commercialexcludedmrk')
     reps=Represent.objects.filter(pk__in=commercialexcluded)
+    files = {}
+    if image:
+        files['image'] = image
     if serverip:
         try:
-            req.get(f'http://{serverip}/products/createmarque2', {
+            req.post(f'http://{serverip}/products/createmarque2', {
                 'name':name,
                 'hideclient':hideclient,
                 'commercialexcluded':commercialexcluded,
                 # get image file
-                'image':mrq.image.url.replace('/media/', '') if mrq.image else ''
-            })
-        except:
-            return JsonResponse({
-                'success':False
-            })
+                #'image':mrq.image.url.replace('/media/', '') if mrq.image else ''
+            }, files=files)
+        except Exception as e:
+            print(f'error in create mark {e}')
     mrq=Mark.objects.create(name=name, image=image, masqueclients=hideclient)
     if len(commercialexcluded) > 0:
         mrq.excludedrep.set(reps)
@@ -205,14 +210,20 @@ def updatemarque(request):
     if image:
         mark.image=image
     mark.save()
-    req.get(f'http://{serverip}/products/updatemarque', {
-        'id':id,
-        'name':request.POST.get('name'),
-        'hideclient':hideclient,
-        'commercialexcluded':commercialexcluded,
-        # get image file
-        'image':mark.image.url.replace('/media/', '') if mark.image else ''
-    })
+    files = {}
+    if image:
+        files['image'] = image
+    if serverip:
+        try:
+            req.get(f'http://{serverip}/products/updatemarque', {
+                'id':id,
+                'name':request.POST.get('name'),
+                'hideclient':hideclient,
+                'commercialexcluded':commercialexcluded,
+                # get image file
+            }, files=files)
+        except Exception as e:
+            print(f'error in update mark {e}')    
     ctx={
         'marques':Mark.objects.all(),
         'title':'List des marques'
