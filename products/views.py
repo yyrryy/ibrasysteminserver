@@ -5186,7 +5186,7 @@ def notifyadmin(request):
                     #'orders':json.loads(res.text)['orders']
                 })
             res.raise_for_status()
-        except req.exceptions.RequestException as e:
+        except Exception as e:
             print('Error notifying admin on server:', e)
             return JsonResponse({
                 'length':0,
