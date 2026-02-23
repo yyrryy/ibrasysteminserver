@@ -27,7 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-CSRF_TRUSTED_ORIGINS=['https://www.brahimpparts.com']
+CSRF_TRUSTED_ORIGINS=['https://www.brahimpparts.com',
+                      'https://brahimpparts.com'
+                      ]
 CORS_ALLOWED_ORIGINS = [
     "*"
 ]
