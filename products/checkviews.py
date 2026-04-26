@@ -29,7 +29,7 @@ import uuid
 from dateutil.relativedelta import relativedelta
 today = timezone.now().date()
 thisyear=timezone.now().year
-serverip = '157.245.74.156'
+from .funcs import serverip
 def checklivraisonno(request):
     no=request.GET.get('no')
     id=request.GET.get('id')
