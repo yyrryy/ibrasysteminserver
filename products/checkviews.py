@@ -791,7 +791,7 @@ def updatestockinv(request):
             'success':False,
             'error':'inventaire cell vide N° '+str(i)
             })
-        if pd.isna(d.inventaire) or int(d.inventaire)<0:
+        if pd.isna(d.inventaire):
             print('cell is empty')
             isinvCellEmpty=True
     if isinvCellEmpty:
@@ -809,49 +809,50 @@ def updatestockinv(request):
         try:
             print('entering', ref)
             product=Produit.objects.get(ref=ref)
-            diff=int(product.stocktotal)-int(inventaire)
-            # system stock - what was found in inventaire, if the stock system is more than inventaire, the difference will be positive, means, the real stock is less than system stock, we need to deduct the diff from stock system by creating livaison items line with inventair is True, or if we have the diff is negatice, means
-            print('>> diff, systemstock, inv', diff, product.stocktotal, inventaire)
-            # case1: diff is negative, means that system stock is less than real stock,  systemstock 10 real stock 12 diff -2, here we willadd the 2 as a stockin kchmnd dar forurnisseur
-            if diff<0:
-                print('>> negative diff, creating stockin', abs(diff))
-                #create a stockin line
-                Stockin.objects.create(
-                date=today,
-                product=product,
-                quantity=abs(diff),
-                price=0,
-                remise=0,
-                qtyofprice=abs(diff),
-                total=0,
-                isinventaire=True
-                )
-                # add to stocktotal
-                product.stocktotal=int(inventaire)
-                # add to diff tracker
-                difftracker.append(f'<tr><td>{product.ref}</td><td>{product.stocktotal}</td><td>{inventaire}</td><td>{diff}</td></tr>')
-                # save product
-                product.save()
-            # case2: diff is more than 0, means that system stock is more than real stock,  systemstock 12 real stock 10 diff 2, here we will add the 2 as a stockout i5ssa adfo4nt 4 stock
-            elif diff>0:
-                print('>> positive diff, creating livraisonitem')
-                #create a livraisonitem line (stockout)
-                Livraisonitem.objects.create(
-                    remise=0,
-                    product=product,
-                    qty=diff,
-                    price=0,
-                    total=0,
-                    date=today,
-                    isinventaire=True
-                )
-                # deduct from stock total
-                product.stocktotal=int(inventaire)
-                # add to diff tracker
-                difftracker.append(f'<tr><td>{product.ref}</td><td>{product.stocktotal}</td><td>{inventaire}</td><td>{diff}</td></tr>')
-                # save product
-                product.save()
+            product.stocktotal=int(inventaire)
             entries+=1
+            # diff=int(product.stocktotal)-int(inventaire)
+            # # system stock - what was found in inventaire, if the stock system is more than inventaire, the difference will be positive, means, the real stock is less than system stock, we need to deduct the diff from stock system by creating livaison items line with inventair is True, or if we have the diff is negatice, means
+            # print('>> diff, systemstock, inv', diff, product.stocktotal, inventaire)
+            # # case1: diff is negative, means that system stock is less than real stock,  systemstock 10 real stock 12 diff -2, here we willadd the 2 as a stockin kchmnd dar forurnisseur
+            # if diff<0:
+            #     print('>> negative diff, creating stockin', abs(diff))
+            #     #create a stockin line
+            #     Stockin.objects.create(
+            #     date=today,
+            #     product=product,
+            #     quantity=abs(diff),
+            #     price=0,
+            #     remise=0,
+            #     qtyofprice=abs(diff),
+            #     total=0,
+            #     isinventaire=True
+            #     )
+            #     # add to stocktotal
+            #     product.stocktotal=int(inventaire)
+            #     # add to diff tracker
+            #     difftracker.append(f'<tr><td>{product.ref}</td><td>{product.stocktotal}</td><td>{inventaire}</td><td>{diff}</td></tr>')
+            #     # save product
+            #     product.save()
+            # # case2: diff is more than 0, means that system stock is more than real stock,  systemstock 12 real stock 10 diff 2, here we will add the 2 as a stockout i5ssa adfo4nt 4 stock
+            # elif diff>0:
+            #     print('>> positive diff, creating livraisonitem')
+            #     #create a livraisonitem line (stockout)
+            #     Livraisonitem.objects.create(
+            #         remise=0,
+            #         product=product,
+            #         qty=diff,
+            #         price=0,
+            #         total=0,
+            #         date=today,
+            #         isinventaire=True
+            #     )
+            #     # deduct from stock total
+            #     product.stocktotal=int(inventaire)
+            #     # add to diff tracker
+            #     difftracker.append(f'<tr><td>{product.ref}</td><td>{product.stocktotal}</td><td>{inventaire}</td><td>{diff}</td></tr>')
+            #     # save product
+            #     product.save()
         except Exception as e:
             print('>> ref not found')
             referrors.append(f">> {ref}: {e} n'existe pas dans la base de donnée")
