@@ -785,20 +785,20 @@ def updatestockinv(request):
     referrors=[]
     difftracker=[]
     isinvCellEmpty=False
-    for i, d in enumerate(df.itertuples()):
-        if isinvCellEmpty:
-            return JsonResponse({
-            'success':False,
-            'error':'inventaire cell vide N° '+str(i)
-            })
-        if pd.isna(d.inventaire):
-            print('cell is empty')
-            isinvCellEmpty=True
-    if isinvCellEmpty:
-        return JsonResponse({
-        'success':False,
-        'error':'inventaire cell vide'
-        })
+    # for i, d in enumerate(df.itertuples()):
+    #     if isinvCellEmpty:
+    #         return JsonResponse({
+    #         'success':False,
+    #         'error':'inventaire cell vide N° '+str(i)
+    #         })
+    #     if pd.isna(d.inventaire):
+    #         print('cell is empty')
+    #         isinvCellEmpty=True
+    # if isinvCellEmpty:
+    #     return JsonResponse({
+    #     'success':False,
+    #     'error':'inventaire cell vide'
+    #     })
     for d in df.itertuples():
         try:
             ref = d.ref.lower().strip()
