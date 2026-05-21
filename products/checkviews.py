@@ -27,8 +27,8 @@ import calendar
 from django.db.models.functions import TruncDay
 import uuid
 from dateutil.relativedelta import relativedelta
-today = timezone.now().date()
-thisyear=timezone.now().year
+from threading import Thread
+from .funcs import updatestockinremoteserver
 from .funcs import serverip
 def checklivraisonno(request):
     no=request.GET.get('no')
@@ -784,6 +784,7 @@ def updatestockinv(request):
     entries=0
     referrors=[]
     difftracker=[]
+    uniqcodes=[]
     isinvCellEmpty=False
     # for i, d in enumerate(df.itertuples()):
     #     if isinvCellEmpty:
@@ -811,6 +812,7 @@ def updatestockinv(request):
             product=Produit.objects.get(ref=ref)
             product.stocktotal=int(inventaire)
             entries+=1
+            uniqcodes.append([product.uniqcode, int(inventaire)])
             # diff=int(product.stocktotal)-int(inventaire)
             # # system stock - what was found in inventaire, if the stock system is more than inventaire, the difference will be positive, means, the real stock is less than system stock, we need to deduct the diff from stock system by creating livaison items line with inventair is True, or if we have the diff is negatice, means
             # print('>> diff, systemstock, inv', diff, product.stocktotal, inventaire)
@@ -856,6 +858,8 @@ def updatestockinv(request):
         except Exception as e:
             print('>> ref not found')
             referrors.append(f">> {ref}: {e} n'existe pas dans la base de donnée")
+    if serverip:
+        Thread(target=updatestockinremoteserver, args=(uniqcodes, serverip)).start()
     print('>>> enteries', entries)
     return JsonResponse({
         'success':True,
