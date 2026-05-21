@@ -28,8 +28,9 @@ from django.db.models.functions import TruncDay
 import uuid
 from dateutil.relativedelta import relativedelta
 from threading import Thread
-from .funcs import updatestockinremoteserver
-from .funcs import serverip
+from .funcs import updatestockinremoteserver, serverip
+today = timezone.now().date()
+thisyear=timezone.now().year
 def checklivraisonno(request):
     no=request.GET.get('no')
     id=request.GET.get('id')

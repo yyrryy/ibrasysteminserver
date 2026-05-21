@@ -26,10 +26,9 @@ from collections import defaultdict
 import calendar
 import uuid
 from threading import Thread
-from .funcs import updatestockinremoteserver
+from .funcs import updatestockinremoteserver, serverip
 today = timezone.now().date()
 thisyear=timezone.now().year
-from .funcs import serverip
 
 def isadmin(user):
     if not user.groups.filter(name='admin').exists():
