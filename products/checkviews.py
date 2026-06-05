@@ -855,7 +855,7 @@ def updatestockinv(request):
             #     # add to diff tracker
             #     difftracker.append(f'<tr><td>{product.ref}</td><td>{product.stocktotal}</td><td>{inventaire}</td><td>{diff}</td></tr>')
             #     # save product
-            #     product.save()
+            product.save()
         except Exception as e:
             print('>> ref not found')
             referrors.append(f">> {ref}: {e} n'existe pas dans la base de donnée")
