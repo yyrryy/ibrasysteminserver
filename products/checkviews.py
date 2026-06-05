@@ -859,6 +859,7 @@ def updatestockinv(request):
         except Exception as e:
             print('>> ref not found')
             referrors.append(f">> {ref}: {e} n'existe pas dans la base de donnée")
+    print('<>>>>> serverip', serverip)
     if serverip:
         Thread(target=updatestockinremoteserver, args=(uniqcodes, serverip)).start()
     print('>>> enteries', entries)
