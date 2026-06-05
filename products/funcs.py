@@ -5,7 +5,7 @@ usesqlite = os.getenv('DEBUG')=='True' or os.getenv('HOME')=='/home/aaliali'
 if usesqlite:
     serverip = 'localhost:8000'
 else:
-    serverip = '157.245.74.156:8000'
+    serverip = '157.245.74.156'
 def updatestockinremoteserver(products, serverip):
     url = f"http://{serverip}/products/updatestockfromthread"
     headers = {'Content-Type': 'application/json'}
