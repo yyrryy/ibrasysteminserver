@@ -2586,13 +2586,14 @@ def addavoirclient(request):
             date=datebon,
             avoirfacture=isfacture
         )
-
+        uniqcodes=[]
         for i in json.loads(products):
             product=Produit.objects.get(pk=i['productid'])
             if isfacture:
                 product.stockfacture=int(product.stockfacture)+int(i['qty'])
             product.stocktotal=int(product.stocktotal)+int(i['qty'])
             product.save()
+            uniqcodes.append([product.uniqcode, product.stocktotal])
             Returned.objects.create(
                 avoir=avoir,
                 product=product,
@@ -2608,6 +2609,8 @@ def addavoirclient(request):
             client.soldbl=round(float(client.soldbl)-float(totalbon), 2)
 
         client.save()
+        if serverip:
+            Thread(target=updatestockinremoteserver, args=(uniqcodes, serverip)).start()
     except Exception as e:
         print('>>error av cl:', e)
 
