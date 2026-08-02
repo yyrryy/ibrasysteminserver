@@ -73,11 +73,19 @@
                                 {% endfor %}
                             </select>
                             <div class="form-check position-relative mt-2">
-                                <input class="form-check-input" type="checkbox" value="True" id="flexCheckIndeterminate" name="hideclient" {% if i.masqueclients %} checked {% endif %}>
-                                <label class="form-check-label" for="flexCheckIndeterminate">
+                                <input class="form-check-input" type="checkbox" value="True" id="flexCheckIndeterminate{{i.id}}" name="hideclient" {% if i.masqueclients %} checked {% endif %}>
+                                <label class="form-check-label" for="flexCheckIndeterminate{{i.id}}">
                                 Masquer les clients
                                 </label>
                             </div>
+                            <!-- desactiver new check box -->
+                            <div class="form-check position-relative mt-2">
+                                <input class="form-check-input" type="checkbox" value="True" id="flexCheckIndeterminatenew{{i.id}}" name="deactivatenewproduct">
+                                <label class="form-check-label" for="flexCheckIndeterminatenew{{i.id}}">
+                                Desactiver new produit
+                                </label>
+                            </div>
+                            
                             <button class="btn btn-sm btn-success w-100 updatecategorybtn" id="{{i.id}}">Mise à jour</button>
                         </form>
                     </div>
@@ -123,7 +131,7 @@
     $('.createcategorybtn').on('click', function(event){
         event.preventDefault()
         console.log('sending')
-        if ($('[name="categoryname"]').val()==""||$('[name="categoryimage"]').val()==""){
+        if ($('[name="categoryname"]').val()==""){
             $('#createcategory').css('border', '1px solid red')
             return
         }

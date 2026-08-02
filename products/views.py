@@ -91,6 +91,7 @@ def createcategory(request):
     files={'image':image}
     # create category
     if serverip:
+        print('>> serverip create categorie', serverip)
         try:
             res=req.post(f'http://{serverip}/products/createcategory2', {
                 'name':name,
@@ -119,6 +120,10 @@ def updatecategory(request):
     image=request.FILES.get('updatecategoryimage') or None
     id=request.POST.get('id')
     hideclient=request.POST.get('hideclient')=='True'
+    deactivatenewproduct=request.POST.get('deactivatenewproduct')=='True'
+    if deactivatenewproduct:
+        # set all products in this category to isnew=False
+        Produit.objects.filter(category__id=id).update(isnew=False)
     commercialexcluded=request.POST.getlist('commercialexcluded')
     reps=Represent.objects.filter(pk__in=commercialexcluded)
     category=Category.objects.get(pk=id)
@@ -136,6 +141,7 @@ def updatecategory(request):
             res = req.post(f'http://{serverip}/products/updatecategory', {
                 'id':id,
                 'hideclient':hideclient,
+                'deactivatenewproduct':deactivatenewproduct,
                 'commercialexcluded':commercialexcluded,
                 'name':request.POST.get('updatecategoryname'),
                 'code':request.POST.get('updatecategorycode'),
@@ -305,21 +311,10 @@ def updatesupplier(request):
 
 def addoneproduct(request):
 
-    PREFIX = "pdct"
-    PREFIX_LEN = len(PREFIX)
-    t = (
-        Produit.objects
-        .annotate(
-            num=Cast(
-                Substr("uniqcode", PREFIX_LEN + 1),  # from position after 'pdct'
-                IntegerField()
-            )
-        )
-        .order_by("-num")
-        .first()
-    )
-    num = int(t.uniqcode.replace(PREFIX, ""))
-    uniqcode = f"{PREFIX}{num + 1}"
+    lastid=0 # zero cause we will add one
+    if Produit.objects.last():
+        lastid=Produit.objects.last().id
+    uniqcode=f'pdct{lastid+1}'
     ref=request.POST.get('refinadd').lower().strip().replace('§', '-')
     name=request.POST.get('nameinadd').strip()
     category=request.POST.get('categoryinadd')

@@ -45,7 +45,7 @@
             <strong>
                 + Ajouter un Commercial
             </strong>
-            <form action="{% url 'products:addclient' %}" class="mt-3" method="post" id="addrepform">
+            <form class="mt-3" method="post" id="addrepform">
                 {% csrf_token %}
                 <input type="text" name="repname" class="form-control mb-2" placeholder="Nom">
                 <input type="number" name="repphone" class="form-control mb-2" placeholder="phone">
@@ -153,7 +153,7 @@
                     contentType: false,
                     success:((data)=>{
                       if (data.success){
-                        updatetab('replist', '/products/commercialspage')
+                        forceupdatetab('addreplist', '/products/commercialspage')
                       }else{
                         alertify.error(data.message)
                       }
